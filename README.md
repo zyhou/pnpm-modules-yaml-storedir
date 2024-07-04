@@ -1,30 +1,65 @@
-# React + TypeScript + Vite
+# PNPM .modules.yaml storeDir issue
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Minimal reproduction for https://github.com/pnpm/pnpm/issues/7727#issuecomment-2112613861
 
-Currently, two official plugins are available:
+Error message:
+`The modules directory at X will be removed and reinstalled from scratch. Proceed?`
+`The modules directories will be removed and reinstalled from scratch. Proceed?`
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+code source: https://github.com/pnpm/pnpm/blob/84654bd2ad01f5473d50e8a630ff805726075c70/pkg-manager/get-context/src/index.ts#L351
 
-## Expanding the ESLint configuration
+Step to reproduce:
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+Define the store dir to the current path and install the dep
 
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+```bash
+pnpm config set store-dir ./.pnpm-store
+pnpm install
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+First check, the path is the right one
+
+```bash
+pnpm store path
+/Users/random.name/dev/pnpm-modules-yaml-storedir/.pnpm-store/v3
+```
+
+Second check, the path in the .modules.yaml is the right one
+
+```bash
+cat node_modules/.modules.yaml | grep storeDir
+storeDir: /Users/maxime.richard/dev/pnpm-modules-yaml-storedir/.pnpm-store/v3
+```
+
+Let's run the app via Docker now.
+
+There is multiple way to start the container, docker compose up etc.. let's use the easier way
+
+```bash
+docker compose run --rm app sh
+```
+
+First check, the store is at the root, it's the righe one
+
+```bash
+pnpm store path
+/app/.pnpm-store/v3
+```
+
+Second check, the path in the .modules.yaml is _NOT_ the right one, it's wrong.
+
+```bash
+cat node_modules/.modules.yaml | grep storeDir
+storeDir: /Users/maxime.richard/dev/pnpm-modules-yaml-storedir/.pnpm-store/v3
+```
+
+Install dep to see the error message
+
+```bash
+pnpm i
+The modules directory at "/app/node_modules" will be removed and reinstalled from scratch. Proceed? (Y/n) · true
+```
+
+We have a miss watch between the storeDir and the pnpm store path, the absolute path is not well handle.
+
+Expected: The local and the docker need to be the same, ie `storeDir: ./.pnpm-store/v3`, so that we can use the same storeDir on both side.
