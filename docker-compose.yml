@@ -1,0 +1,10 @@
+name: pnpm-test
+services:
+  app:
+    build:
+      dockerfile: ./dockerfile
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/app
+    command: bash
