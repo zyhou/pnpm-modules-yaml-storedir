@@ -33,7 +33,7 @@ storeDir: /Users/random.name/dev/pnpm-modules-yaml-storedir/.pnpm-store/v3
 
 Let's run the app via Docker now.
 
-There is multiple way to start the container, docker compose up etc.. let's use the easier way
+There is multiple way to start the container, docker compose up etc.. let's use the easiest way
 
 ```bash
 docker compose run --rm app sh
@@ -62,4 +62,4 @@ The modules directory at "/app/node_modules" will be removed and reinstalled fro
 
 We have a miss watch between the storeDir and the pnpm store path, the absolute path is not well handled.
 
-Expected: The local and the docker need to be the same, so that we can use the same storeDir on both side.
+Expected: The local and the docker need to be the same, so that we can use the same pnpm-store on both side.
