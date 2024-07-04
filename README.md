@@ -28,7 +28,7 @@ Second check, the path in the .modules.yaml is the right one
 
 ```bash
 cat node_modules/.modules.yaml | grep storeDir
-storeDir: /Users/maxime.richard/dev/pnpm-modules-yaml-storedir/.pnpm-store/v3
+storeDir: /Users/random.name/dev/pnpm-modules-yaml-storedir/.pnpm-store/v3
 ```
 
 Let's run the app via Docker now.
@@ -50,7 +50,7 @@ Second check, the path in the .modules.yaml is **NOT** the right one, it's wrong
 
 ```bash
 cat node_modules/.modules.yaml | grep storeDir
-storeDir: /Users/maxime.richard/dev/pnpm-modules-yaml-storedir/.pnpm-store/v3
+storeDir: /Users/random.name/dev/pnpm-modules-yaml-storedir/.pnpm-store/v3
 ```
 
 Install dep to see the error message
@@ -60,6 +60,6 @@ pnpm i
 The modules directory at "/app/node_modules" will be removed and reinstalled from scratch. Proceed? (Y/n) · true
 ```
 
-We have a miss watch between the storeDir and the pnpm store path, the absolute path is not well handle.
+We have a miss watch between the storeDir and the pnpm store path, the absolute path is not well handled.
 
-Expected: The local and the docker need to be the same, ie `storeDir: ./.pnpm-store/v3`, so that we can use the same storeDir on both side.
+Expected: The local and the docker need to be the same, so that we can use the same storeDir on both side.
