@@ -46,7 +46,7 @@ pnpm store path
 /app/.pnpm-store/v3
 ```
 
-Second check, the path in the .modules.yaml is _NOT_ the right one, it's wrong.
+Second check, the path in the .modules.yaml is **NOT** the right one, it's wrong.
 
 ```bash
 cat node_modules/.modules.yaml | grep storeDir
